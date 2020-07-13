@@ -1,6 +1,8 @@
 ## markfluence
 
-Application to publish documents in [markdown](https://en.wikipedia.org/wiki/Markdown) format to [Confluence](https://www.atlassian.com/software/confluence). Typical usecase is in a [Docs as Code](https://www.writethedocs.org/guide/docs-as-code/) scenario.
+Application to publish documents in [markdown](https://en.wikipedia.org/wiki/Markdown) format
+to [Confluence](https://www.atlassian.com/software/confluence). Typical usecase is in a
+[Docs as Code](https://www.writethedocs.org/guide/docs-as-code/) scenario.
 
 ### Status
 
