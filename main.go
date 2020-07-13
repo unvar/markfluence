@@ -5,6 +5,8 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/unvar/markfuence/workers"
+
 	"github.com/unvar/markfuence/files"
 )
 
@@ -25,7 +27,14 @@ func main() {
 	mdFilePattern := filepath.Join(*docsDirPattern, "**", "*.md")
 	mdFiles := files.FindFilesInGit(*rootDirAbs, mdFilePattern, *changedOnly, *gitDepth)
 
-	for _, file := range mdFiles {
-		println(file)
-	}
+	// push files into jobs channel
+	jobs := make(chan string, len(mdFiles))
+	go workers.LoadJobs(mdFiles, jobs)
+
+	// create a worker pool
+	done := make(chan bool)
+	go workers.CreateWorkerPool(5, jobs, done)
+
+	// wait for the workers to be done
+	<-done
 }
