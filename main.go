@@ -33,7 +33,7 @@ func main() {
 
 	// create a worker pool
 	done := make(chan bool)
-	go workers.CreateWorkerPool(5, jobs, done)
+	go workers.CreateWorkerPool(5, jobs, files.ProcessFile, done)
 
 	// wait for the workers to be done
 	<-done

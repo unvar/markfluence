@@ -1,7 +1,6 @@
 package workers
 
 import (
-	"fmt"
 	"sync"
 )
 
@@ -17,20 +16,25 @@ func LoadJobs(files []string, jobs chan<- string) {
 // CreateWorkerPool can be used to create a set of
 // workers that run the submitted job function for all
 // the jobs in a given channel
-func CreateWorkerPool(size int, jobs <-chan string, done chan<- bool) {
+func CreateWorkerPool(
+	size int,
+	jobs <-chan string,
+	handler func(payload string),
+	done chan<- bool,
+) {
 	var wg sync.WaitGroup
 	for i := 0; i < size; i++ {
 		wg.Add(1)
-		go worker(&wg, jobs)
+		go worker(&wg, jobs, handler)
 	}
 	wg.Wait()
 
 	done <- true
 }
 
-func worker(wg *sync.WaitGroup, jobs <-chan string) {
+func worker(wg *sync.WaitGroup, jobs <-chan string, handler func(payload string)) {
 	defer wg.Done()
 	for job := range jobs {
-		fmt.Println(job)
+		handler(job)
 	}
 }

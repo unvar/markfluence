@@ -1,13 +1,20 @@
 package files
 
 import (
+	"bytes"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"os/exec"
 	"path/filepath"
 	"strings"
 
 	"github.com/bmatcuk/doublestar"
+
+	"github.com/yuin/goldmark"
+	meta "github.com/yuin/goldmark-meta"
+	"github.com/yuin/goldmark/extension"
+	"github.com/yuin/goldmark/parser"
 )
 
 // FindFilesInGit finds all files in git in the given root
@@ -38,4 +45,36 @@ func FindFilesInGit(rootDirAbs, includePattern string, changedOnly bool, gitDept
 	}
 
 	return files
+}
+
+// ProcessFile processes a markdown file and upserts the
+// content to confluence
+func ProcessFile(filepath string) {
+	convertMarkdownToHTML(filepath)
+}
+
+func convertMarkdownToHTML(filepath string) {
+	// read the file
+	data, err := ioutil.ReadFile(filepath)
+	if err != nil {
+		panic(err)
+	}
+
+	// create the md parser
+	markdown := goldmark.New(
+		goldmark.WithExtensions(
+			meta.Meta,
+			extension.GFM,
+		),
+	)
+
+	// convert the file to html
+	var buf bytes.Buffer
+	context := parser.NewContext()
+	if err := markdown.Convert(data, &buf, parser.WithContext(context)); err != nil {
+		panic(err)
+	}
+
+	metaData := meta.Get(context)
+	fmt.Println(metaData["title"], "|", metaData["space"], "|", metaData["parent"])
 }
